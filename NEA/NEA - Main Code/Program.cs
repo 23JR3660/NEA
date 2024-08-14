@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,7 @@ namespace NEA___Main_Code
 {
     internal class Program
     {
-        public struct item // struct used for algorithms such as quick sort that allwos you to treat values in array as individuals with an ID as opposed to just their value and so compare between items in an array with the same value
-        {
-            public int value, ID;
-        }
-        static int SortKey = 1;
+        static int SortKey = 1; //global key to organise the order of multiple tests completed in one instance
         static int[] makeSet(bool evenlydis, bool ordered, int size, int range)
         {
             int[] set = new int[size];
@@ -46,7 +43,7 @@ namespace NEA___Main_Code
             return set;
 
         }
-        static int[] shuffle(int[] set)
+        static int[] shuffle(int[] set) //completes a random swap one time for every element that the array has
         {
             Random rnd = new Random();
             int temp;
@@ -68,38 +65,7 @@ namespace NEA___Main_Code
             }
             Console.WriteLine();
         }
-        static item[] swapItems(item[] items, int IDx, int IDy)
-        {
-            int indexX = 0, indexY = 0;
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (items[i].ID == IDx) indexX = i;
-                if (items[i].ID == IDy) indexY = i;
-            }
-            item temp = items[indexX];
-            items[indexX] = items[indexY];z
-            items[indexY] = temp;
-            return items;
-        }
-        static void doBubbles(int iterations) //sets up a test with multiple variables, ordered, range etc to do 
-        {
-            int[] set1;
-            for (int i = 0; i < iterations; i++)
-            {
-                set1 = makeSet(false, false, i * 10, 100);
-                doBubbleSort(set1, 100);
-            }
-        }
-        static void doCountings(int iterations)
-        {
-            int[] set1;
-            for (int i = 0; i < iterations; i++)
-            {
-                set1 = makeSet(false, false, i * 10, 100);
-                doCountingSort(set1, 100);
-            }
-        }
-        static int[] intListToArray(List<int> set)
+        static int[] intListToArray(List<int> set) // converts an integer list to an integer array
         {
             int[] array = new int[set.Count];
             for (int i = 0; i < set.Count; i++)
@@ -108,19 +74,27 @@ namespace NEA___Main_Code
             }
             return array;
         }
-        static item[] itemListToArray(List<item> set)
+        static List<int> intArrayToList(int[] set) //converts an integer array to an integer list
         {
-            item[] array = new item[set.Count];
-            for (int i = 0; i < set.Count; i++)
+            List<int> list = new List<int>();
+            for(int i = 0; i < set.Length; i++)
             {
-                array[i] = set[i];
+               list.Add(set[i]);
             }
-            return array;
+            return list;
         }
-        static void doCountingSort(int[] set, int range)
+
+        static int[] partitionArray(int[] set, int startIndex, int endIndex) // returns the section of an array between the startIndex and endIndex
         {
-            long memoryBeforeSort = GC.GetTotalMemory(true);
-            Stopwatch sw = new Stopwatch(); sw.Start();
+            int[] setSection = new int[endIndex - startIndex + 1];
+            for(int i = 0; i < setSection.Length; i++)
+            {
+                setSection[i] = set[i + startIndex];
+            }
+            return setSection;
+        }
+        static int[] doCountingSort(int[] set, int range) //carries out a full counting sort with a given integer array and returns sorted array
+        {
 
             int[] occurences = new int[range + 1];
             for (int i = 1; i < occurences.Length; i++)
@@ -139,87 +113,84 @@ namespace NEA___Main_Code
                     sorted.Add(i);
                 }
             }
-            sw.Stop();
-            long memoryAfterSort = GC.GetTotalMemory(true);
-            StoreResult("Counting Sort", range, intListToArray(sorted), sw.ElapsedMilliseconds, memoryAfterSort - memoryBeforeSort);
-            sw.Reset();
+            return intListToArray(sorted);
         }
-        static void doQuicks(int iterations)
+        static int[] doBubbleSort(int[] set, int range) // carries out a bubble sort with a given integer array and returns sorted array
         {
-            int[] set1;
-            item[] itemSet;
-            for (int i = 0; i < iterations; i++)
+            while (BubblePass(ref set)) ; //will run passes of bubble sort until false is returned signalling a swap was not neccessary
+            return set;
+        }
+        static int[] doMergeSort(int[] set) // recursively carries out a Merge sort
+        {
+            int[] left;
+            int[] right;
+            int[] result = new int[set.Length];
+            if (set.Length <= 1) //base case for when the set has been split into single elements
+                return set;
+
+
+            int midPoint = set.Length / 2;
+            left = new int[midPoint];
+            if (set.Length % 2 == 0)
+                right = new int[midPoint];
+            else
+                right = new int[midPoint + 1];
+
+            for (int i = 0; i < midPoint; i++)
             {
-                set1 = makeSet(false, false, i * 10, 100);
-                itemSet = new item[set1.Length];
-                for (int j = 0; j < iterations; j++)
+                left[i] = set[i];
+            }
+            int x = 0;
+
+            for (int i = midPoint; i < set.Length; i++)
+            {
+                right[x] = set[i];
+                x++;
+            }
+
+            left = doMergeSort(left);
+            right = doMergeSort(right);
+            result = merge(left, right);
+            return result;
+        }
+        static int[] merge(int[] left, int[] right) 
+        {
+
+            int resultLength = right.Length + left.Length;
+            int[] result = new int[resultLength];
+            int indexLeft = 0, indexRight = 0, indexResult = 0;
+
+            while (indexLeft < left.Length || indexRight < right.Length) 
+            {
+                if (indexLeft < left.Length && indexRight < right.Length)
                 {
-                    itemSet[j].value = set1[j];
+                    if (left[indexLeft] <= right[indexRight])
+                    {
+                        result[indexResult] = left[indexLeft];
+                        indexLeft++;
+                        indexResult++;
+                    }
+                    else
+                    {
+                        result[indexResult] = right[indexRight];
+                        indexRight++;
+                        indexResult++;
+                    }
                 }
-                doQuickSort(itemSet, 100);
+                else if (indexLeft < left.Length)
+                {
+                    result[indexResult] = left[indexLeft];
+                    indexLeft++;
+                    indexResult++;
+                }
+                else if (indexRight < right.Length)
+                {
+                    result[indexResult] = right[indexRight];
+                    indexRight++;
+                    indexResult++;
+                }
             }
-        }
-        static void doQuickSort(item[] set, int range)
-        {
-            long memoryBeforeSort = GC.GetTotalMemory(true);
-            Stopwatch sw = new Stopwatch(); sw.Start();
-
-
-
-
-
-
-
-
-            sw.Stop();
-            long memoryAfterSort = GC.GetTotalMemory(true);
-            StoreResult("Quick Sort", range, intListToArray(sorted), sw.ElapsedMilliseconds, memoryAfterSort - memoryBeforeSort);
-            sw.Reset();
-        }
-        static item[] LeftPartition(item[] original, int centre)
-        {
-            item[] partitionedSet = new item[centre];
-            for (int i = 0; i < centre - 1; i++)
-            {
-                partitionedSet[i] = original[i];
-            }
-            return partitionedSet;
-        }
-        static item[] RightPartition(item[] original, int centre)
-        {
-            item[] partitionedSet = new item[original.Length - centre];
-            for (int i = 0; i < original.Length - centre - 1; i++)
-            {
-                partitionedSet[i] = original[i + centre];
-            }
-            return partitionedSet;
-        }
-        static item[] QuickSortIteration(item[] set, int pivot)
-        {
-            if (set.Length == 1) return set;
-            List<item> newSet = new List<item>();
-            for (int i = 0; i < set.Length; i++)
-            {
-                if (set[i].value < pivot) newSet.Add(set[i]);
-            }
-            for (int i = 0; i < set.Length; i++)
-            {
-                if (set[i].value == pivot) newSet.Add(set[i]);
-            }
-            for (int i = 0; i < set.Length; i++)
-            {
-                if (set[i].value > pivot) newSet.Add(set[i]);
-            }
-            return itemListToArray(newSet);
-        }
-        static void doBubbleSort(int[] set, int range) // carries out the sorting operation
-        {
-            long memoryBeforeSort = GC.GetTotalMemory(true); // This stores the total memory used so far in the program so that later we can subtract the current value from this to see how much has been used in a sort
-            Stopwatch sw = new Stopwatch(); sw.Start();
-            while (BubblePass(ref set)) ;
-            long memoryAfterSort = GC.GetTotalMemory(true);
-            StoreResult("Bubble Sort", range, set, sw.ElapsedMilliseconds, memoryAfterSort - memoryBeforeSort);
-            sw.Reset();
+            return result;
         }
         static void StoreResult(string SortName, int range, int[] set, float timeTaken, long memoryUsed)
         {
@@ -263,8 +234,10 @@ namespace NEA___Main_Code
         }
         static void Main(string[] args)
         {
-            doCountings(200);
-            doBubbles(200);
+            int[] setty = makeSet(true, false, 10, 10);
+            printSet(setty);
+            setty = doMergeSort(setty);
+            printSet(setty);
             Console.ReadKey();
         }
     }
