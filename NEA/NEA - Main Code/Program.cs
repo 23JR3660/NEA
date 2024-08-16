@@ -249,9 +249,34 @@ namespace NEA___Main_Code
             int pivotValue = set[0];
             
             arrayPair leftAndRight = pivot(set);
-            if(leftAndRight.left.Length == 0) return doQuickSort(stitch(pivotValue,leftAndRight.right));
-            if (leftAndRight.right.Length == 0) return doQuickSort(stitch(leftAndRight.left,pivotValue));
+            if(leftAndRight.left.Length == 0) return doQuickSort(leftAndRight.right);
+            if (leftAndRight.right.Length == 0) return doQuickSort(leftAndRight.left);
             return doQuickSort(stitch(doQuickSort(leftAndRight.left),pivotValue,doQuickSort(leftAndRight.right)));
+        }
+        static int partition(int[] set, int low, int high)
+        {
+            int pivot = set[low];//pivot chosen as first number
+
+            int i = (low-1);
+            for(int j = low; j <= high -1; j++)
+            {
+                if (set[j] < pivot)
+                {
+                    i++;
+                    swap(set,i,j);
+                }
+            }
+            swap(set, i + 1, low);
+            return i + 1;
+        }
+        static void quickSort(int[] set, int low, int high)
+        {
+            if(low < high)
+            {
+                int index = partition(set, low, high);
+                quickSort(set, low, index - 1);
+                quickSort(set, index _ 1, high);
+            }
         }
         static void StoreResult(string SortName, int range, int[] set, float timeTaken, long memoryUsed)
         {
@@ -297,7 +322,8 @@ namespace NEA___Main_Code
         {
             int[] setty = makeSet(true, false, 10, 10);
             printSet(setty);
-            setty = doQuickSort(setty);
+            Console.Readkey();
+            quickSort(setty, 0, setty.Length - 1);
             printSet(setty);
             Console.ReadKey();
         }
