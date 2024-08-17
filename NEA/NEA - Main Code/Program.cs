@@ -207,11 +207,11 @@ namespace NEA___Main_Code
             }
         }
         
-        static bool BubblePass(ref int[] set) //carries out a single pass of bubble sort and returns a boolean for if it had to do a swap
+        static bool BubblePass(int[] set, int endPoint) //carries out a single pass of bubble sort and returns a boolean for if it had to do a swap
         {
             bool swapMade = false;
             int temp;
-            for (int i = 0; i < set.Length - 1; i++)
+            for (int i = 0; i < endPoint; i++)
             {
                 if (set[i] > set[i + 1])
                 {
@@ -225,7 +225,10 @@ namespace NEA___Main_Code
         }
         static void doBubbleSort(int[] set) // carries out a bubble sort with a given integer array
         {
-            while (BubblePass(ref set)) ; //will run passes of bubble sort until false is returned signalling a swap was not necessary
+            for(int i = set.Length-1;i > 0; i--)
+            {
+                BubblePass(set, i);
+            }
         }
         static void StoreResult(int SortKey, int range, int[] set, float timeTaken, long memoryUsed)
         {
@@ -324,7 +327,23 @@ namespace NEA___Main_Code
         }
         static void Main(string[] args)
         {
+            //Counting Sort
+            int[] setty;
+            Stopwatch sw = new Stopwatch();
             
+            setty = makeSet(true, false, 100000, 100000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
+            printSet(setty);
+            sw.Start();
+            doBubbleSort(setty);
+            sw.Stop();
+            printSet(setty);
+
+            //Results of Counting Sort
+
+            Console.WriteLine(SortID + ")" + "Bubble Sort" + " Size " + setty.Length + " Completed in " + sw.ElapsedMilliseconds + "ms"); SortID++;
+            sw.Reset();
+
+            Console.ReadKey();
         }
     }
 }
