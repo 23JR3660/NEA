@@ -4,31 +4,32 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace NEA___Main_Code
 {
     internal class Program
     {
         static int SortID = 1; //global key to organise the order of multiple tests completed in one instance
-        static int[] makeSet(bool evenlyDistributed, bool ordered, int size, int range)
+        static int[] makeSet(bool evenlyDistributed, bool preSorted, bool preInverseSorted, int size, int range)
         {
             int[] set = new int[size];
             Random rnd = new Random();
-            if (evenlyDistributed && ordered)
+            if (preSorted || evenlyDistributed)
             {
                 for (int i = 0; i < size; i++)
                 {
                     set[i] = i + 1; //i+1 is inserted so as to not include 0 in sets for the sake of readability
                 }
+                if(evenlyDistributed)shuffle(set);
                 return set;
             }
-            if (evenlyDistributed)
+            if (preInverseSorted)
             {
-                for (int i = 0; i < size; ++i)
+                for (int i = 0; i < size; i++)
                 {
-                    set[i] = i + 1;
+                    set[size - i -1] = i + 1; //i+1 is inserted so as to not include 0 in sets for the sake of readability
                 }
-                shuffle(set);
                 return set;
             }
             for (int i = 0; i < size; ++i)
@@ -227,7 +228,22 @@ namespace NEA___Main_Code
         {
             for(int i = set.Length-1;i > 0; i--)
             {
-                BubblePass(set, i);
+                if (!BubblePass(set, i)) return;
+            }
+        }
+        static void doInsertionSort(int[] set)
+        {
+            int key, j;
+            for(int i = 1; i < set.Length; i++)
+            {
+                key = set[i];
+                j = i - 1;
+                while(j > -1 && set[j] > key)
+                {
+                    set[j + 1] = set[j];
+                    j--;
+                }
+                set[j+1] = key;
             }
         }
         static void StoreResult(int SortKey, int range, int[] set, float timeTaken, long memoryUsed)
@@ -254,14 +270,14 @@ namespace NEA___Main_Code
             }
             SortKey++;
         }
-        static void demoTest() //demo test for all currently programmed algorithms
+        static void demoTest() //demo test for all currently programmed algorithm
         {
             int[] setty;
             Stopwatch sw = new Stopwatch();
 
             //Bubble Sort
 
-            setty = makeSet(true, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
+            setty = makeSet(true, false,false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
             sw.Start();
             doBubbleSort(setty);
             sw.Stop();
@@ -278,7 +294,7 @@ namespace NEA___Main_Code
 
             //Merge Sort
 
-            setty = makeSet(true, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
+            setty = makeSet(true, false, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
             sw.Start();
             setty = doMergeSort(setty);
             sw.Stop();
@@ -294,7 +310,7 @@ namespace NEA___Main_Code
 
             //Quick Sort
 
-            setty = makeSet(true, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
+            setty = makeSet(true, false, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
             sw.Start();
             doQuickSort(setty, 0, setty.Length - 1); //the 2nd and 3rd parameters only exist because this subroutine is recursive. Do NOT change them here
             sw.Stop();
@@ -311,7 +327,7 @@ namespace NEA___Main_Code
 
             //Counting Sort
 
-            setty = makeSet(true, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
+            setty = makeSet(true, false, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
             sw.Start();
             setty = doCountingSort(setty);
             sw.Stop();
@@ -327,21 +343,23 @@ namespace NEA___Main_Code
         }
         static void Main(string[] args)
         {
-            //Counting Sort
             int[] setty;
             Stopwatch sw = new Stopwatch();
-            
-            setty = makeSet(true, false, 100000, 100000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
+
+            //Insertion Sort
+
+            setty = makeSet(true, false, false, 1000, 1000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
             printSet(setty);
             sw.Start();
-            doBubbleSort(setty);
-            sw.Stop();
+            doInsertionSort(setty);
             printSet(setty);
+            sw.Stop();
 
-            //Results of Counting Sort
+            //Results of Insertion Sort
 
-            Console.WriteLine(SortID + ")" + "Bubble Sort" + " Size " + setty.Length + " Completed in " + sw.ElapsedMilliseconds + "ms"); SortID++;
+            Console.WriteLine(SortID + ")" + "Insertion Sort" + " Size " + setty.Length + " Completed in " + sw.ElapsedMilliseconds + "ms"); SortID++;
             sw.Reset();
+
 
             Console.ReadKey();
         }
