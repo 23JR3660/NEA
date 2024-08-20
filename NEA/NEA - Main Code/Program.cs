@@ -1,62 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Xml.Linq;
 
 namespace NEA___Main_Code
 {
     internal class Program
     {
-        static int SortID = 1; //global key to organise the order of multiple tests completed in one instance
-        static int[] makeSet(bool evenlyDistributed, bool preSorted, bool preInverseSorted, int size, int range)
+        static int sortID = 1; // Global key to organise the order of multiple tests completed in the same instance.
+
+        // Returns an integer array based on the parameters provided.
+        static int[] makeSet(bool evenlyDistributed, bool preSorted, bool preInverseSorted, int size, int range) 
         {
             int[] set = new int[size];
             Random rnd = new Random();
+
             if (preSorted || evenlyDistributed)
             {
                 for (int i = 0; i < size; i++)
                 {
-                    set[i] = i + 1; //i+1 is inserted so as to not include 0 in sets for the sake of readability
+                    set[i] = i + 1; // Fills the array with values from 1 to 'size' inclusive in that order.
                 }
-                if(evenlyDistributed)shuffle(set);
-                return set;
+                if(evenlyDistributed)shuffle(set); // Shuffles this if not pre-sorted.
+                
             }
-            if (preInverseSorted)
+
+            else if (preInverseSorted)
             {
                 for (int i = 0; i < size; i++)
                 {
-                    set[size - i -1] = i + 1; //i+1 is inserted so as to not include 0 in sets for the sake of readability
+                    set[size - i -1] = i + 1;  // Fills the array with values from 'size' to 1 inclusive in that order (reverse order).
                 }
-                return set;
             }
-            for (int i = 0; i < size; ++i)
+
+            else
             {
-                set[i] = rnd.Next(1, range);
+                for (int i = 0; i < size; ++i)
+                {
+                    set[i] = rnd.Next(1, range +1); // If none of the other conditions are met, the only remaining condition is the set being random. This returns a set populated with numbers from 1 to 'size' inclusive.
+                }
             }
+            
             return set;
 
         }
+
+        // Swaps the values at the given indices.
         static void swap(int[] set, int indexOne, int indexTwo)
         {
             int temp;
-            temp = set[indexOne];
-            set[indexOne] = set[indexTwo];
-            set[indexTwo] = temp;
+            temp = set[indexOne]; // Temporarily store the value at indexOne.
+
+            set[indexOne] = set[indexTwo]; // Replace value at indexOne with value at indexTwo.
+
+            set[indexTwo] = temp; // Replace value at indexTwo with the former indexOne value.
         }
-        static void shuffle(int[] set) //completes a random swap one time for every element that the array has
+
+        // Completes an amount of swaps equal to the amount of elements present in the set.
+        static void shuffle(int[] set) 
         {
             Random rnd = new Random();
             int index;
+
             for (int i = 0; i < set.Length; i++)
             {
                 index = rnd.Next(0, set.Length);
                 swap(set, i, index);
             }
+
         }
-        static void printSet(int[] set)
+
+        // Completes an amount of swaps equal to the parameter provided.
+        static void shuffle(int[] set, int swaps)
+        {
+            Random rnd = new Random();
+            int index;
+
+            for (int i = 0; i < swaps; i++)
+            {
+                index = rnd.Next(0, set.Length);
+                swap(set, i, index);
+            }
+
+        }
+
+        // Prints the set to the console, with each element separated by a "|".
+        static void printSet(int[] set)  
         {
             for (int i = 0; i < set.Length; i++)
             {
@@ -65,58 +99,93 @@ namespace NEA___Main_Code
             Console.WriteLine();
         }
 
-        static int[] intListToArray(List<int> set) // converts an integer list to an integer array
+        // Takes in a list of integers and returns an array of integers.
+        static int[] intListToArray(List<int> list)
         {
-            int[] array = new int[set.Count];
-            for (int i = 0; i < set.Count; i++)
+            int[] array = new int[list.Count]; // Creates an array the same size as the list.
+
+            for (int i = 0; i < list.Count; i++)
             {
-                array[i] = set[i];
+                array[i] = list[i]; // Copies each value from the list into the array.
             }
             return array;
         }
-        static List<int> intArrayToList(int[] set) //converts an integer array to an integer list
+
+        // Takes in an array of integers and returns a list of integers.
+        static List<int> intArrayToList(int[] array)
         {
-            List<int> list = new List<int>();
-            for (int i = 0; i < set.Length; i++)
+            List<int> list = new List<int>(); // Creates an empty list.
+
+            for (int i = 0; i < array.Length; i++)
             {
-                list.Add(set[i]);
+                list.Add(array[i]); // Copies each value from the array into the list.
             }
             return list;
         }
-        static int[] doCountingSort(int[] set) //carries out a full counting sort with a given integer array and returns the sorted array
+
+        //Calculates and returns the largest value in the inputted integer array.
+        static int findMax(int[] set)
         {
             int maxValue = 0;
+
             for(int i = 0; i < set.Length; i++)
             {
                 if(set[i] > maxValue) maxValue = set[i];
             }
-            int[] occurences = new int[maxValue + 1];
-            for (int i = 0; i < occurences.Length; i++)
+
+            return maxValue;
+        }
+
+        //Calculates and returns the largest value in the inputted integer list.
+        static int findMax(List<int> set) 
+        {
+            int maxValue = 0;
+
+            for (int i = 0; i < set.Count; i++)
             {
-                occurences[i] = 0;
+                if (set[i] > maxValue) maxValue = set[i];
             }
+
+            return maxValue;
+        }
+
+        //Performs a Counting Sort on the given array and returns the sorted array.
+        static int[] doCountingSort(int[] set)
+        {
+            int[] occurrences = new int[findMax(set) + 1]; //Creates an array the size of the highest value in the set plus 1.
+
+            for (int i = 0; i < occurrences.Length; i++)
+            {
+                occurrences[i] = 0;  // Initialize all elements in the occurrences array to 0 so that they can be incremented.
+            }
+
+            // Counts the occurrences of each number in the array.
             for (int i = 0; i < set.Length; i++)
             {
-                occurences[set[i]]++;
+                occurrences[set[i]]++;
             }
-            List<int> sorted = new List<int>();
-            for (int i = 0; i < occurences.Length; i++)
+
+            List<int> sorted = new List<int>(); // Creates an empty list to store the sorted elements.
+
+            // Add elements to the sorted list based on their occurrence count.
+            for (int i = 0; i < occurrences.Length; i++)
             {
-                for (int j = 0; j < occurences[i]; j++)
+                for (int j = 0; j < occurrences[i]; j++)
                 {
                     sorted.Add(i);
                 }
             }
-            return intListToArray(sorted);
+
+            return intListToArray(sorted); // Convert the sorted list to an array and return it.
         }
-        
-        
+
+        // Merges two sorted arrays into a single sorted array.
         static int[] merge(int[] left, int[] right)
         {
 
-            int resultLength = right.Length + left.Length;
-            int[] result = new int[resultLength];
-            int indexLeft = 0, indexRight = 0, indexResult = 0;
+            int resultLength = right.Length + left.Length; // Calculate the length of the resulting array.
+            int[] result = new int[resultLength];  // Create an array of calculated length to store the merged result.
+            int indexLeft = 0, indexRight = 0, indexResult = 0; 
 
             while (indexLeft < left.Length || indexRight < right.Length)
             {
@@ -148,22 +217,36 @@ namespace NEA___Main_Code
                     indexResult++;
                 }
             }
-            return result;
+
+            return result; // Return the merged array.
         }
-        static int[] doMergeSort(int[] set) // recursively carries out a Merge sort
+
+        // Performs a Merge Sort on the given array and returns the sorted array.
+        static int[] doMergeSort(int[] set)
         {
-            int[] left, right;
-            if (set.Length <= 1) //base case for when the set has been split into single elements
+            
+            if (set.Length <= 1) // Base case: if the array has one or fewer elements, it's already sorted.
                 return set;
 
 
-            int midPoint = set.Length / 2;
-            left = new int[midPoint];
-            if (set.Length % 2 == 0)
-                right = new int[midPoint];
-            else
-                right = new int[midPoint + 1];
+            int[] left, right;
 
+            int midPoint = set.Length / 2; // Determine the midpoint to split the array by.
+
+            left = new int[midPoint]; // Create the left subarray
+
+            //Create the right subarray starting from the correct index.
+
+            if (set.Length % 2 == 0)
+            {
+                right = new int[midPoint];
+            }
+            else
+            {
+                right = new int[midPoint + 1];
+            }
+            
+            // Fill the left subarray with the first half of the original array.
             for (int i = 0; i < midPoint; i++)
             {
                 left[i] = set[i];
@@ -171,197 +254,132 @@ namespace NEA___Main_Code
 
             int x = 0;
 
+            // Fill the right subarray with the second half of the original array.
             for (int i = midPoint; i < set.Length; i++)
             {
                 right[x] = set[i];
                 x++;
             }
 
-            left = doMergeSort(left);
-            right = doMergeSort(right);
-            return merge(left, right);
+            left = doMergeSort(left); // Recursively sort the left subarray.
+
+            right = doMergeSort(right); // Recursively sort the right subarray.
+
+            return merge(left, right); // Merge the sorted subarrays and return the result.
         }
 
-        static int partition(int[] set, int low, int high) //completes the pivoting function and returns an int for the position of the pivot
+        // Partitions the array around a pivot and returns the pivot's final position.
+        static int partition(int[] set, int low, int high)
         {
-            int pivot = set[low];//pivot chosen as first number
+            int pivot = set[low]; // Choose the first element as the pivot
 
-            int k = high;
+            int rightBoundary = high; // When a number larger than the pivot is found, this is where it is to be placed.
+
+            //Move elements greater than the pivot to the right
             for (int i = high; i > low; i--)
             {
                 if (set[i] > pivot)
                 {
-                    swap(set, i, k);
-                    k--;
+                    swap(set, i, rightBoundary); // Move current element if greater than pivot.
+                    rightBoundary--; // Move right boundary to the left.
                 }
             }
-            swap(set, k, low);
-            return k;
+            swap(set, rightBoundary, low); // Place the pivot in its correct position which must be the rightBoundary since all numbers greater than the pivot were move to the right of THIS index.
+
+            return rightBoundary; // Return the final position of the pivot
         }
-        static void doQuickSort(int[] set, int low, int high) //low and high are the indices between which the quickSort is to be carried out in a given instance
+
+        // Performs a Quick Sort on the array between the given indices (low to high).
+        static void doQuickSort(int[] set, int low, int high)
         {
             if (low < high)
             {
-                int index = partition(set, low, high);
-                doQuickSort(set, low, index - 1);
-                doQuickSort(set, index + 1, high);
+                int index = partition(set, low, high); // Partition the array and get the pivot's position.
+                doQuickSort(set, low, index - 1); // Recursively sort the left subarray.
+                doQuickSort(set, index + 1, high); // Recursively sort the right subarray.
             }
         }
-        
-        static bool BubblePass(int[] set, int endPoint) //carries out a single pass of bubble sort and returns a boolean for if it had to do a swap
+
+        // Performs a single pass of Bubble Sort and returns true if a swap was made.
+        static bool BubblePass(int[] set, int endPoint) 
         {
             bool swapMade = false;
-            int temp;
+
+            // If the current element is greater than the next, swap them.
             for (int i = 0; i < endPoint; i++)
             {
                 if (set[i] > set[i + 1])
                 {
-                    temp = set[i];
-                    set[i] = set[i + 1];
-                    set[i + 1] = temp;
-                    swapMade = true;
+                    swap(set,i,i + 1);
+                    swapMade = true; // Mark that a swap was made.
                 }
             }
             return swapMade;
         }
-        static void doBubbleSort(int[] set) // carries out a bubble sort with a given integer array
+
+        // Performs a full Bubble Sort on the given array.
+        static void doBubbleSort(int[] set)
         {
             for(int i = set.Length-1;i > 0; i--)
             {
                 if (!BubblePass(set, i)) return;
             }
         }
+
+        // Performs an Insertion Sort on the given array.
         static void doInsertionSort(int[] set)
         {
-            int key, j;
-            for(int i = 1; i < set.Length; i++)
+            int elementInserting; // The element to be inserted.
+            int insertionIndex;
+
+            for (int i = 1; i < set.Length; i++)
             {
-                key = set[i];
-                j = i - 1;
-                while(j > -1 && set[j] > key)
+                elementInserting = set[i];
+                insertionIndex = i - 1;
+                // Move up elements one position to the right
+                while(insertionIndex > -1 && set[insertionIndex] > elementInserting)
                 {
-                    set[j + 1] = set[j];
-                    j--;
+                    set[insertionIndex + 1] = set[insertionIndex];
+                    insertionIndex--;
                 }
-                set[j+1] = key;
+                set[insertionIndex +1] = elementInserting; // Insert the selected element at its correct position. This is insertionIndex + 1 since everything has been moved up one.
             }
         }
+
+        // Stores the result of a sorting operation in two log files.
         static void StoreResult(int SortKey, int range, int[] set, float timeTaken, long memoryUsed)
         {
-            string[] SortNames = { "Bubble Sort", "Quick Sort", "Merge Sort", "Counting Sort" };
+            string[] SortNames = { "Bubble Sort", "Quick Sort", "Merge Sort", "Counting Sort", "Insertion Sort" };
+
+            // Log the result details to "AlgorithmLog.txt".
             using (StreamWriter writer = new StreamWriter("AlgorithmLog.txt", true))
             {
-                writer.WriteLine(SortID + ")" + SortNames[SortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms with " + memoryUsed + "B total memory");
-                Console.WriteLine(SortID + ")" + SortNames[SortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms with " + memoryUsed + "B total memory");
+                writer.WriteLine(sortID + ")" + SortNames[SortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms with " + memoryUsed + "B total memory");
+                Console.WriteLine(sortID + ")" + SortNames[SortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms with " + memoryUsed + "B total memory");
 
             }
+
+            // Log the sorted array to "SortedAlgorithms.txt".
             using (StreamWriter writer = new StreamWriter("SortedAlgorithms.txt", true))
             {
-                writer.Write(SortKey + ")");
+                writer.Write(sortID + ")");
                 for (int i = 0; i < set.Length; i++)
                 {
                     writer.Write(set[i] + "|");
                 }
                 writer.WriteLine(); writer.WriteLine();
             }
+
+            // Log the time taken to "times.txt".
             using (StreamWriter writer = new StreamWriter("times.txt", true))
             {
                 writer.WriteLine(timeTaken);
             }
-            SortKey++;
+            sortID++; // Increment the sortID
         }
-        static void demoTest() //demo test for all currently programmed algorithm
-        {
-            int[] setty;
-            Stopwatch sw = new Stopwatch();
-
-            //Bubble Sort
-
-            setty = makeSet(true, false,false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
-            sw.Start();
-            doBubbleSort(setty);
-            sw.Stop();
-
-            //Results of Bubble Sort
-
-            Console.WriteLine(SortID + ")" + "Bubble Sort" + " Size " + setty.Length + " Completed in " + sw.ElapsedMilliseconds + "ms"); SortID++;
-            sw.Reset();
-
-
-            Console.ReadKey();
-
-
-
-            //Merge Sort
-
-            setty = makeSet(true, false, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
-            sw.Start();
-            setty = doMergeSort(setty);
-            sw.Stop();
-
-            //Results of Merge Sort
-
-            Console.WriteLine(SortID + ")" + "Merge Sort" + " Size " + setty.Length + " Completed in " + sw.ElapsedMilliseconds + "ms"); SortID++;
-            sw.Reset();
-
-            Console.ReadKey();
-
-
-
-            //Quick Sort
-
-            setty = makeSet(true, false, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
-            sw.Start();
-            doQuickSort(setty, 0, setty.Length - 1); //the 2nd and 3rd parameters only exist because this subroutine is recursive. Do NOT change them here
-            sw.Stop();
-
-            //Results of Quick Sort
-
-            Console.WriteLine(SortID + ")" + "Quick Sort" + " Size " + setty.Length + " Completed in " + sw.ElapsedMilliseconds + "ms"); SortID++;
-            sw.Reset();
-
-
-            Console.ReadKey();
-
-
-
-            //Counting Sort
-
-            setty = makeSet(true, false, false, 10000, 10000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
-            sw.Start();
-            setty = doCountingSort(setty);
-            sw.Stop();
-
-            //Results of Counting Sort
-
-            Console.WriteLine(SortID + ")" + "Counting Sort" + " Size " + setty.Length + " Completed in " + sw.ElapsedMilliseconds + "ms"); SortID++;
-            sw.Reset();
-
-            Console.ReadKey();
-            Console.WriteLine("All tests are over.");
-            Console.ReadKey();
-        }
+        
         static void Main(string[] args)
         {
-            int[] setty;
-            Stopwatch sw = new Stopwatch();
-
-            //Insertion Sort
-
-            setty = makeSet(true, false, false, 1000, 1000); //first number is the length of array and the second number is the range of numbers generated. Do not change the booleans in this case
-            printSet(setty);
-            sw.Start();
-            doInsertionSort(setty);
-            printSet(setty);
-            sw.Stop();
-
-            //Results of Insertion Sort
-
-            Console.WriteLine(SortID + ")" + "Insertion Sort" + " Size " + setty.Length + " Completed in " + sw.ElapsedMilliseconds + "ms"); SortID++;
-            sw.Reset();
-
-
-            Console.ReadKey();
         }
     }
 }
