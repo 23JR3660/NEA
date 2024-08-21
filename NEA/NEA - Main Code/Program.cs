@@ -178,6 +178,15 @@ namespace NEA___Main_Code
 
             return intListToArray(sorted); // Convert the sorted list to an array and return it.
         }
+        //Performs a Counting Sort on the given array of only the specified digit of each number.
+        static int[] doCountingSortDigit(int[] set, int digit)
+        {
+            return set;
+        }
+        static int findDigit(int input, int placeValue)
+        {
+            if(placeValue != 1 || placeValue )
+        }
 
         // Merges two sorted arrays into a single sorted array.
         static int[] merge(int[] left, int[] right)
@@ -345,6 +354,10 @@ namespace NEA___Main_Code
                 set[insertionIndex +1] = elementInserting; // Insert the selected element at its correct position. This is insertionIndex + 1 since everything has been moved up one.
             }
         }
+        static void doLsdRadixSort(int[] set)
+        {
+            
+        }
 
         // Stores the result of a sorting operation in two log files.
         static void StoreResult(int SortKey, int range, int[] set, float timeTaken, long memoryUsed)
@@ -380,6 +393,12 @@ namespace NEA___Main_Code
         
         static void Main(string[] args)
         {
+            int a = 123;
+            Console.WriteLine(a % 10000 / 1000);
+            Console.WriteLine(a % 1000 / 100);
+            Console.WriteLine(a % 100 / 10);
+            Console.WriteLine(a % 10 / 1);
+            Console.ReadKey();
         }
     }
 }
