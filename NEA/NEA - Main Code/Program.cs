@@ -178,12 +178,13 @@ namespace NEA___Main_Code
 
             return intListToArray(sorted); // Convert the sorted list to an array and return it.
         }
-        //Returns the nth digit of the given number.
+        //Returns the digit in the place column with value 10^n
         static int findDigit(int number, int n)
         {
-            return int.Parse(number.ToString().Substring(n, 1));
+           Console.WriteLine((int)((number % Math.Pow(10, n)) / Math.Pow(10, n-1)));
+            return (int)((number % Math.Pow(10, n)) / Math.Pow(10, n-1));
         }
-        static int[] doRadixPass(int[] set, int digit)
+        static int[] doRadixPass(int[] set, int digit, int maxLength)
         {
             List<int> result = new List<int>(); //List used so it can be added to sequentially.
 
@@ -191,7 +192,7 @@ namespace NEA___Main_Code
             {
                 for(int j = 0; j < 10; j++)
                 {
-                    if (findDigit(set[i], digit) == j)
+                    if (findDigit(set[i], maxLength - digit ) == j)
                     {
                         result.Add(set[i]);
                     }
@@ -202,7 +203,14 @@ namespace NEA___Main_Code
 
         static int[] doLSDRadixSort(int[] set)
         {
-            
+            int max = findMax(set);
+            int maxLength = (int)(Math.Floor(Math.Log10(max))) + 1;
+            for(int i = maxLength; i > 0; i--)
+            {
+                set = doRadixPass(set, i, maxLength);
+                printSet(set);
+            }
+            return set;
         }
         // Merges two sorted arrays into a single sorted array.
         static int[] merge(int[] left, int[] right)
@@ -370,11 +378,6 @@ namespace NEA___Main_Code
                 set[insertionIndex +1] = elementInserting; // Insert the selected element at its correct position. This is insertionIndex + 1 since everything has been moved up one.
             }
         }
-        static void doLsdRadixSort(int[] set)
-        {
-            
-        }
-
         // Stores the result of a sorting operation in two log files.
         static void StoreResult(int SortKey, int range, int[] set, float timeTaken, long memoryUsed)
         {
@@ -409,6 +412,12 @@ namespace NEA___Main_Code
         
         static void Main(string[] args)
         {
+            int[] set = makeSet(false, false, false, 4, 10);
+            printSet(set);
+            Console.ReadKey();
+            set = doLSDRadixSort(set);
+            printSet(set);
+            Console.ReadKey();
         }
     }
 }
