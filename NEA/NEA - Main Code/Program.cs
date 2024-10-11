@@ -179,15 +179,15 @@ namespace NEA___Main_Code
             return intListToArray(sorted); // Convert the sorted list to an array and return it.
         }
         //Performs a Counting Sort on the given array of only the specified digit of each number.
-        static int[] doCountingSortDigit(int[] set, int digit)
-        {
-            return set;
-        }
         static int findDigit(int input, int placeValue)
         {
-            if(placeValue != 1 || placeValue )
+            
         }
 
+        static int[] doLSDRadixSort(int[] set)
+        {
+
+        }
         // Merges two sorted arrays into a single sorted array.
         static int[] merge(int[] left, int[] right)
         {
@@ -393,12 +393,6 @@ namespace NEA___Main_Code
         
         static void Main(string[] args)
         {
-            int a = 123;
-            Console.WriteLine(a % 10000 / 1000);
-            Console.WriteLine(a % 1000 / 100);
-            Console.WriteLine(a % 100 / 10);
-            Console.WriteLine(a % 10 / 1);
-            Console.ReadKey();
         }
     }
 }
