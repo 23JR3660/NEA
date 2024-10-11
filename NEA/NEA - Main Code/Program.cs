@@ -178,10 +178,26 @@ namespace NEA___Main_Code
 
             return intListToArray(sorted); // Convert the sorted list to an array and return it.
         }
-        //Performs a Counting Sort on the given array of only the specified digit of each number.
-        static int findDigit(int input, int placeValue)
+        //Returns the nth digit of the given number.
+        static int findDigit(int number, int n)
         {
-            
+            return int.Parse(number.ToString().Substring(n, 1));
+        }
+        static int[] doRadixPass(int[] set, int digit)
+        {
+            List<int> result = new List<int>(); //List used so it can be added to sequentially.
+
+            for(int i = 0; i < set.Length; i++)
+            {
+                for(int j = 0; j < 10; j++)
+                {
+                    if (findDigit(set[i], digit) == j)
+                    {
+                        result.Add(set[i]);
+                    }
+                }
+            }
+            return intListToArray(result);
         }
 
         static int[] doLSDRadixSort(int[] set)
