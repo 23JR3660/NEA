@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
@@ -178,23 +179,23 @@ namespace NEA___Main_Code
 
             return intListToArray(sorted); // Convert the sorted list to an array and return it.
         }
-        //Returns the digit in the place column with value 10^n
-        static int findDigit(int number, int n)
+        //Returns the nth digit
+        static int findDigit(int number, int n, int maxLength)
         {
-           Console.WriteLine((int)((number % Math.Pow(10, n)) / Math.Pow(10, n-1)));
-            return (int)((number % Math.Pow(10, n)) / Math.Pow(10, n-1));
+           string paddedNumber = number.ToString().PadLeft(maxLength, '0');
+           return int.Parse(paddedNumber.Substring(n, 1));
+            
         }
         static int[] doRadixPass(int[] set, int digit, int maxLength)
         {
             List<int> result = new List<int>(); //List used so it can be added to sequentially.
-
-            for(int i = 0; i < set.Length; i++)
+            for(int i = 0; i < 10; i++)
             {
-                for(int j = 0; j < 10; j++)
+                for(int j = 0; j < set.Length; j++)
                 {
-                    if (findDigit(set[i], maxLength - digit ) == j)
+                    if(findDigit(set[j], digit, maxLength) == i)
                     {
-                        result.Add(set[i]);
+                        result.Add(set[j]);
                     }
                 }
             }
@@ -204,11 +205,10 @@ namespace NEA___Main_Code
         static int[] doLSDRadixSort(int[] set)
         {
             int max = findMax(set);
-            int maxLength = (int)(Math.Floor(Math.Log10(max))) + 1;
-            for(int i = maxLength; i > 0; i--)
+            int maxLength = max.ToString().Length;
+            for(int i = maxLength-1; i >= 0 ; i--)
             {
                 set = doRadixPass(set, i, maxLength);
-                printSet(set);
             }
             return set;
         }
@@ -381,7 +381,7 @@ namespace NEA___Main_Code
         // Stores the result of a sorting operation in two log files.
         static void StoreResult(int SortKey, int range, int[] set, float timeTaken, long memoryUsed)
         {
-            string[] SortNames = { "Bubble Sort", "Quick Sort", "Merge Sort", "Counting Sort", "Insertion Sort" };
+            string[] SortNames = { "Bubble Sort", "Quick Sort", "Merge Sort", "Counting Sort", "Insertion Sort", "LSD Radix Sort" };
 
             // Log the result details to "AlgorithmLog.txt".
             using (StreamWriter writer = new StreamWriter("AlgorithmLog.txt", true))
@@ -412,7 +412,7 @@ namespace NEA___Main_Code
         
         static void Main(string[] args)
         {
-            int[] set = makeSet(false, false, false, 4, 10);
+            int[] set = makeSet(false, false, false, 5, 10000);
             printSet(set);
             Console.ReadKey();
             set = doLSDRadixSort(set);
