@@ -445,9 +445,10 @@ namespace NEA___Main_Code
             string[] sortNames = { "Bubble Sort", "Merge Sort", "Counting Sort", "Quick Sort", "Insertion Sort", "LSD Radix Sort", "MSD Radix Sort", "Heap Sort" };
 
             // Log the result details to "AlgorithmAveragesLog.txt".
-            using (StreamWriter writer = new StreamWriter("AlgorithmLog.txt", true))
+            using (StreamWriter writer = new StreamWriter("AlgorithmAveragesLog.txt", true))
             {
                 writer.WriteLine("1000 " + sortNames[sortKey] + "s with numbers in range 1-" + range + " size " + arrayLength + " completed in average " + averageTime + "ms");
+                Console.WriteLine("1000 " + sortNames[sortKey] + "s with numbers in range 1-" + range + " size " + arrayLength + " completed in average " + averageTime + "ms");
             }
         }
         static void runFullTest(int noOfTests = 1000)
@@ -457,9 +458,9 @@ namespace NEA___Main_Code
             {
                 for (int sortBeingRun = 0; sortBeingRun < 8; sortBeingRun++) //Loop to iterate through all 8 tests for a sort from a randomised set.
                 {
-                    for (int i = 0; i < 10; i++)//Loop to iterate through all 10 ranges
+                    for (int i = 1; i < 9; i++)//Loop to iterate through all 10 ranges
                     {
-                        for (int j = 0; j < 9; j++)//Loop to iterate through all 9 array sizes
+                        for (int j = 1; j < 9; j++)//Loop to iterate through all 9 array sizes
                         {
                             long totalTimeTaken = 0;
                             for (int testNo = 0; testNo < noOfTests; testNo++) //Loop to run the required test 1000 times
@@ -489,60 +490,61 @@ namespace NEA___Main_Code
                                         doBubbleSort(setToBeTested);
                                         sw.Stop();
                                         totalTimeTaken += sw.ElapsedMilliseconds;
-                                        StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
+                                        //StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 1:
                                         sw.Start();
                                         doMergeSort(setToBeTested);
                                         sw.Stop();
                                         totalTimeTaken += sw.ElapsedMilliseconds;
-                                        StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
+                                        //StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 2:
                                         sw.Start();
                                         doCountingSort(setToBeTested);
                                         sw.Stop();
                                         totalTimeTaken += sw.ElapsedMilliseconds;
-                                        StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
+                                        //StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 3:
                                         sw.Start();
                                         doQuickSort(setToBeTested, 0, arraySize - 1);
                                         sw.Stop();
                                         totalTimeTaken += sw.ElapsedMilliseconds;
-                                        StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
+                                       // StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 4:
                                         sw.Start();
                                         doInsertionSort(setToBeTested);
                                         sw.Stop();
                                         totalTimeTaken += sw.ElapsedMilliseconds;
-                                        StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
+                                       // StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 5:
                                         sw.Start();
                                         doLSDRadixSort(setToBeTested);
                                         sw.Stop();
                                         totalTimeTaken += sw.ElapsedMilliseconds;
-                                        StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
+                                       // StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 6:
                                         sw.Start();
                                         //Insert MSD Radix Here
                                         sw.Stop();
                                         totalTimeTaken += sw.ElapsedMilliseconds;
-                                        StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
+                                       // StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 7:
                                         sw.Start();
                                         //Insert Heap Sort here.
                                         sw.Stop();
                                         totalTimeTaken += sw.ElapsedMilliseconds;
-                                        StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
+                                        //StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                 }
                             }
                             int averageTime = (int)(totalTimeTaken / 1000);
+                            storeResultAverage(sortBeingRun, (int)Math.Pow(10,i), (int)Math.Pow(10,j), averageTime);
                         }  
                         
                     }
@@ -552,11 +554,7 @@ namespace NEA___Main_Code
         }
         static void Main(string[] args)
         {
-            int[] set = makeSet(false, false, false, 5, 10000);
-            printSet(set);
-            Console.ReadKey();
-            set = doLSDRadixSort(set);
-            printSet(set);
+            runFullTest();
             Console.ReadKey();
         }
     }
