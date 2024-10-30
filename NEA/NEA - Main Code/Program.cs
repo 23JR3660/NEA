@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
-using System.Globalization;
+using System.Diagnostics.SymbolStore;
 using System.IO;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Xml.Linq;
 
 namespace NEA___Main_Code
 {
@@ -15,11 +10,12 @@ namespace NEA___Main_Code
     {
         static int sortID = 1; // Global key to organise the order of multiple tests completed in the same instance.
 
+        static Random rnd = new Random(); //Global random object. Must be random since generating a new seed each instance will create overlap in generated numbers.
+
         // Returns an integer array based on the parameters provided.
-        static int[] makeSet(bool evenlyDistributed, bool preSorted, bool preInverseSorted, int size, int range) 
+        static int[] makeSet(bool evenlyDistributed, bool preSorted, bool preInverseSorted, int size, int range)
         {
             int[] set = new int[size];
-            Random rnd = new Random();
 
             if (preSorted || evenlyDistributed)
             {
@@ -27,15 +23,15 @@ namespace NEA___Main_Code
                 {
                     set[i] = i + 1; // Fills the array with values from 1 to 'size' inclusive in that order.
                 }
-                if(evenlyDistributed)shuffle(set); // Shuffles this if not pre-sorted.
-                
+                if (evenlyDistributed) shuffle(set); // Shuffles this if not pre-sorted.
+
             }
 
             else if (preInverseSorted)
             {
                 for (int i = 0; i < size; i++)
                 {
-                    set[size - i -1] = i + 1;  // Fills the array with values from 'size' to 1 inclusive in that order (reverse order).
+                    set[size - i - 1] = i + 1;  // Fills the array with values from 'size' to 1 inclusive in that order (reverse order).
                 }
             }
 
@@ -43,10 +39,10 @@ namespace NEA___Main_Code
             {
                 for (int i = 0; i < size; ++i)
                 {
-                    set[i] = rnd.Next(1, range +1); // If none of the other conditions are met, the only remaining condition is the set being random. This returns a set populated with numbers from 1 to 'size' inclusive.
+                    set[i] = rnd.Next(1, range + 1); // If none of the other conditions are met, the only remaining condition is the set being random. This returns a set populated with numbers from 1 to 'size' inclusive.
                 }
             }
-            
+
             return set;
 
         }
@@ -63,7 +59,7 @@ namespace NEA___Main_Code
         }
 
         // Completes an amount of swaps equal to the amount of elements present in the set.
-        static void shuffle(int[] set) 
+        static void shuffle(int[] set)
         {
             Random rnd = new Random();
             int index;
@@ -91,7 +87,7 @@ namespace NEA___Main_Code
         }
 
         // Prints the set to the console, with each element separated by a "|".
-        static void printSet(int[] set)  
+        static void printSet(int[] set)
         {
             for (int i = 0; i < set.Length; i++)
             {
@@ -129,16 +125,16 @@ namespace NEA___Main_Code
         {
             int maxValue = 0;
 
-            for(int i = 0; i < set.Length; i++)
+            for (int i = 0; i < set.Length; i++)
             {
-                if(set[i] > maxValue) maxValue = set[i];
+                if (set[i] > maxValue) maxValue = set[i];
             }
 
             return maxValue;
         }
 
         //Calculates and returns the largest value in the inputted integer list.
-        static int findMax(List<int> set) 
+        static int findMax(List<int> set)
         {
             int maxValue = 0;
 
@@ -182,18 +178,18 @@ namespace NEA___Main_Code
         //Returns the nth digit
         static int findDigit(int number, int n, int maxLength)
         {
-           string paddedNumber = number.ToString().PadLeft(maxLength, '0');
-           return int.Parse(paddedNumber.Substring(n, 1));
-            
+            string paddedNumber = number.ToString().PadLeft(maxLength, '0');
+            return int.Parse(paddedNumber.Substring(n, 1));
+
         }
         static int[] doRadixPass(int[] set, int digit, int maxLength)
         {
             List<int> result = new List<int>(); //List used so it can be added to sequentially.
-            for(int i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
             {
-                for(int j = 0; j < set.Length; j++)
+                for (int j = 0; j < set.Length; j++)
                 {
-                    if(findDigit(set[j], digit, maxLength) == i)
+                    if (findDigit(set[j], digit, maxLength) == i)
                     {
                         result.Add(set[j]);
                     }
@@ -206,7 +202,7 @@ namespace NEA___Main_Code
         {
             int max = findMax(set);
             int maxLength = max.ToString().Length;
-            for(int i = maxLength-1; i >= 0 ; i--)
+            for (int i = maxLength - 1; i >= 0; i--)
             {
                 set = doRadixPass(set, i, maxLength);
             }
@@ -218,7 +214,7 @@ namespace NEA___Main_Code
 
             int resultLength = right.Length + left.Length; // Calculate the length of the resulting array.
             int[] result = new int[resultLength];  // Create an array of calculated length to store the merged result.
-            int indexLeft = 0, indexRight = 0, indexResult = 0; 
+            int indexLeft = 0, indexRight = 0, indexResult = 0;
 
             while (indexLeft < left.Length || indexRight < right.Length)
             {
@@ -257,7 +253,7 @@ namespace NEA___Main_Code
         // Performs a Merge Sort on the given array and returns the sorted array.
         static int[] doMergeSort(int[] set)
         {
-            
+
             if (set.Length <= 1) // Base case: if the array has one or fewer elements, it's already sorted.
                 return set;
 
@@ -278,7 +274,7 @@ namespace NEA___Main_Code
             {
                 right = new int[midPoint + 1];
             }
-            
+
             // Fill the left subarray with the first half of the original array.
             for (int i = 0; i < midPoint; i++)
             {
@@ -334,7 +330,7 @@ namespace NEA___Main_Code
         }
 
         // Performs a single pass of Bubble Sort and returns true if a swap was made.
-        static bool BubblePass(int[] set, int endPoint) 
+        static bool BubblePass(int[] set, int endPoint)
         {
             bool swapMade = false;
 
@@ -343,7 +339,7 @@ namespace NEA___Main_Code
             {
                 if (set[i] > set[i + 1])
                 {
-                    swap(set,i,i + 1);
+                    swap(set, i, i + 1);
                     swapMade = true; // Mark that a swap was made.
                 }
             }
@@ -353,7 +349,7 @@ namespace NEA___Main_Code
         // Performs a full Bubble Sort on the given array.
         static void doBubbleSort(int[] set)
         {
-            for(int i = set.Length-1;i > 0; i--)
+            for (int i = set.Length - 1; i > 0; i--)
             {
                 if (!BubblePass(set, i)) return;
             }
@@ -370,26 +366,30 @@ namespace NEA___Main_Code
                 elementInserting = set[i];
                 insertionIndex = i - 1;
                 // Move up elements one position to the right
-                while(insertionIndex > -1 && set[insertionIndex] > elementInserting)
+                while (insertionIndex > -1 && set[insertionIndex] > elementInserting)
                 {
                     set[insertionIndex + 1] = set[insertionIndex];
                     insertionIndex--;
                 }
-                set[insertionIndex +1] = elementInserting; // Insert the selected element at its correct position. This is insertionIndex + 1 since everything has been moved up one.
+                set[insertionIndex + 1] = elementInserting; // Insert the selected element at its correct position. This is insertionIndex + 1 since everything has been moved up one.
             }
         }
         // Stores the result of a sorting operation in two log files, with memory used included.
-        static void StoreResult(int sortKey, int range, int[] set, float timeTaken, long memoryUsed)
+        static void StoreResult(int sortKey, int range, int[] set, float timeTaken, long memoryUsed, bool print = false)
         {
             string[] sortNames = { "Bubble Sort", "Merge Sort", "Counting Sort", "Quick Sort", "Insertion Sort", "LSD Radix Sort", "MSD Radix Sort", "Heap Sort" };
 
             // Log the result details to "AlgorithmLog.txt".
-            using (StreamWriter writer = new StreamWriter("AlgorithmLog.txt", true))
+            if (print)
             {
-                writer.WriteLine(sortID + ")" + sortNames[sortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms with " + memoryUsed + "B total memory");
-                Console.WriteLine(sortID + ")" + sortNames[sortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms with " + memoryUsed + "B total memory");
+                using (StreamWriter writer = new StreamWriter("AlgorithmLog.txt", true))
+                {
+                    writer.WriteLine(sortID + ")" + sortNames[sortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms with " + memoryUsed + "B total memory");
+                    Console.WriteLine(sortID + ")" + sortNames[sortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms with " + memoryUsed + "B total memory");
 
+                }
             }
+            
 
             // Log the sorted array to "SortedAlgorithms.txt".
             using (StreamWriter writer = new StreamWriter("SortedAlgorithms.txt", true))
@@ -402,7 +402,8 @@ namespace NEA___Main_Code
                 writer.WriteLine(); writer.WriteLine();
             }
 
-            // Log the time taken to "times.txt".
+            // Log the time taken to "times.txt"
+
             using (StreamWriter writer = new StreamWriter("times.txt", true))
             {
                 writer.WriteLine(timeTaken);
@@ -410,17 +411,21 @@ namespace NEA___Main_Code
             sortID++; // Increment the sortID
         }
         //Stores the result of a sorting operation in two log files, without memory used included.
-        static void StoreResult(int SortKey, int range, int[] set, float timeTaken)
+        static void StoreResult(int SortKey, int range, int[] set, float timeTaken, bool print = false)
         {
             string[] sortNames = { "Bubble Sort", "Merge Sort", "Counting Sort", "Quick Sort", "Insertion Sort", "LSD Radix Sort", "MSD Radix Sort", "Heap Sort" };
 
             // Log the result details to "AlgorithmLog.txt".
-            using (StreamWriter writer = new StreamWriter("AlgorithmLog.txt", true))
+            if (print)
             {
-                writer.WriteLine(sortID + ")" + sortNames[SortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms");
-                Console.WriteLine(sortID + ")" + sortNames[SortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms");
+                using (StreamWriter writer = new StreamWriter("AlgorithmLog.txt", true))
+                {
+                    writer.WriteLine(sortID + ")" + sortNames[SortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms");
+                    Console.WriteLine(sortID + ")" + sortNames[SortKey] + " Range 1-" + range + " Size " + set.Length + " Completed in " + timeTaken + "ms");
 
+                }
             }
+            
 
             // Log the sorted array to "SortedAlgorithms.txt".
             using (StreamWriter writer = new StreamWriter("SortedAlgorithms.txt", true))
@@ -440,33 +445,47 @@ namespace NEA___Main_Code
             }
             sortID++; // Increment the sortID
         }
-        static void storeResultAverage(int sortKey, int range, int arrayLength, int averageTime )
+        static void storeResultAverage(int sortKey, int range, int arrayLength, double totalTime, string testingSheetName)
         {
             string[] sortNames = { "Bubble Sort", "Merge Sort", "Counting Sort", "Quick Sort", "Insertion Sort", "LSD Radix Sort", "MSD Radix Sort", "Heap Sort" };
 
             // Log the result details to "AlgorithmAveragesLog.txt".
             using (StreamWriter writer = new StreamWriter("AlgorithmAveragesLog.txt", true))
             {
-                writer.WriteLine("1000 " + sortNames[sortKey] + "s with numbers in range 1-" + range + " size " + arrayLength + " completed in average " + averageTime + "ms");
-                Console.WriteLine("1000 " + sortNames[sortKey] + "s with numbers in range 1-" + range + " size " + arrayLength + " completed in average " + averageTime + "ms");
+                writer.WriteLine("1000 " + sortNames[sortKey] + "s with numbers in range 1-" + range + " size " + arrayLength + " completed in average " + (int)totalTime / 1000 + "ms (~" + totalTime + "ms total time)");
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("1000 " + sortNames[sortKey] + "s with numbers in range 1-" + range + " size " + arrayLength + " completed in average " + (int)totalTime / 1000 + "ms (~" + totalTime + "ms total time)");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            using (StreamWriter writer = new StreamWriter(testingSheetName, true))
+            {
+                writer.WriteLine((int)totalTime/1000 + ",");
             }
         }
-        static void runFullTest(int noOfTests = 1000)
+        static void runFullTest(string testingSheetName, int noOfTests = 1000)
         {
             Stopwatch sw = new Stopwatch();
-            for(int sortedState = 0; sortedState < 3; sortedState++)
+            for (int sortedState = 0; sortedState < 3; sortedState++)
             {
                 for (int sortBeingRun = 0; sortBeingRun < 8; sortBeingRun++) //Loop to iterate through all 8 tests for a sort from a randomised set.
                 {
-                    for (int i = 1; i < 9; i++)//Loop to iterate through all 10 ranges
+                    for (int i = 1; i < 7; i++)//Loop to iterate through all 6 ranges
                     {
-                        for (int j = 1; j < 9; j++)//Loop to iterate through all 9 array sizes
+                        for (int j = 1; j < 6; j++)//Loop to iterate through all 5 array sizes
                         {
                             long totalTimeTaken = 0;
                             for (int testNo = 0; testNo < noOfTests; testNo++) //Loop to run the required test 1000 times
                             {
                                 sw.Reset();
-                                int range = (int)Math.Pow(10, i);
+                                int range;
+                                if (i == 6)
+                                {
+                                     range = int.MaxValue;
+                                }
+                                else
+                                {
+                                     range = (int)Math.Pow(10, i);
+                                }
                                 int arraySize = (int)Math.Pow(10, j);
                                 int[] setToBeTested;
                                 if (sortedState == 0)
@@ -489,72 +508,60 @@ namespace NEA___Main_Code
                                         sw.Start();
                                         doBubbleSort(setToBeTested);
                                         sw.Stop();
-                                        totalTimeTaken += sw.ElapsedMilliseconds;
-                                        //StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 1:
                                         sw.Start();
                                         doMergeSort(setToBeTested);
                                         sw.Stop();
-                                        totalTimeTaken += sw.ElapsedMilliseconds;
-                                        //StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 2:
                                         sw.Start();
                                         doCountingSort(setToBeTested);
                                         sw.Stop();
-                                        totalTimeTaken += sw.ElapsedMilliseconds;
-                                        //StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 3:
                                         sw.Start();
                                         doQuickSort(setToBeTested, 0, arraySize - 1);
                                         sw.Stop();
-                                        totalTimeTaken += sw.ElapsedMilliseconds;
-                                       // StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 4:
                                         sw.Start();
                                         doInsertionSort(setToBeTested);
                                         sw.Stop();
-                                        totalTimeTaken += sw.ElapsedMilliseconds;
-                                       // StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 5:
                                         sw.Start();
                                         doLSDRadixSort(setToBeTested);
                                         sw.Stop();
-                                        totalTimeTaken += sw.ElapsedMilliseconds;
-                                       // StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 6:
                                         sw.Start();
                                         //Insert MSD Radix Here
                                         sw.Stop();
-                                        totalTimeTaken += sw.ElapsedMilliseconds;
-                                       // StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                     case 7:
                                         sw.Start();
                                         //Insert Heap Sort here.
                                         sw.Stop();
-                                        totalTimeTaken += sw.ElapsedMilliseconds;
-                                        //StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
                                         break;
                                 }
+                                totalTimeTaken += sw.ElapsedMilliseconds;
+                                StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
+
                             }
-                            int averageTime = (int)(totalTimeTaken / 1000);
-                            storeResultAverage(sortBeingRun, (int)Math.Pow(10,i), (int)Math.Pow(10,j), averageTime);
-                        }  
-                        
+                            storeResultAverage(sortBeingRun, (int)Math.Pow(10, i), (int)Math.Pow(10, j), totalTimeTaken, testingSheetName);
+                        }
+
                     }
                 }
             }
-            
+
         }
         static void Main(string[] args)
         {
-            runFullTest();
+            Console.Write("Enter name of testing sheet .txt file:");
+            string fileName = Console.ReadLine();
+            runFullTest(fileName);
             Console.ReadKey();
         }
     }
