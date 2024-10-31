@@ -466,7 +466,7 @@ namespace NEA___Main_Code
                 {
                     for (int j = 0; j < testData.GetLength(1); j++)
                     {
-                        if (testData[i, j] =! -1)
+                        if (testData[i, j] != -1)
                         {
                             writer.Write(testData[i,j]);
                         }
@@ -573,7 +573,8 @@ namespace NEA___Main_Code
                                 StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
 
                             }
-                            testData[9 * sortedState + sortBeingRun, 6 * (i - 1) + j - 1] = totalTimeTaken / 1000;
+                            testData[6 * (i - 1) + j - 1, 9 * sortedState + sortBeingRun] = totalTimeTaken / 1000;
+                            print2DArrayTotxt(testData, testingSheetName);
                             storeResultAverage(sortBeingRun, (int)Math.Pow(10, i), (int)Math.Pow(10, j), totalTimeTaken, testingSheetName);
                         }
                         startSize = 1; //Change start size so that the test for the next set of ranges is done from the beginning.
@@ -588,110 +589,94 @@ namespace NEA___Main_Code
         {
             Console.Write("Enter name of testing sheet .txt file:"); Console.WriteLine();
             string fileName = Console.ReadLine();
-            Console.Write("Would you like to start from a set start point (Y) or start from the beginning of all tests (N)?")
+            Console.Write("Would you like to start from a set start point (Y) or start from the beginning of all tests (N)?");
             if (Console.ReadLine().ToUpper() == "Y")
             {
                 int startAlgorithm, startRange, startSize, startSortedState;
-                Console.WriteLine("Which algorithm would you like to start with?")
+                Console.WriteLine("Which algorithm would you like to start with?");
                 bool choiceSelected = false;
                 while (choiceSelected == false)
                 {
-                    Console.WriteLine("Select Starting algorithm : Bubble Sort (0), Merge Sort (1), Counting Sort (2), Quick Sort (3), Insertion Sort (4), LSD Radix Sort (5), MSD Radix Sort (6), Heap Sort (7)")
+                    Console.WriteLine("Select Starting algorithm : Bubble Sort (0), Merge Sort (1), Counting Sort (2), Quick Sort (3), Insertion Sort (4), LSD Radix Sort (5), MSD Radix Sort (6), Heap Sort (7)");
                     switch (Console.ReadLine())
                     {
-                        case: "0"
+                        case "0":
                             startAlgorithm = 0;
                             choiceSelected = true;
                             break;
-                        case:
-                            "1"
+                        case "1":
                             startAlgorithm = 1;
                             choiceSelected = true;
                             break;
-                        case:
-                            "2"
+                        case "2":
                             startAlgorithm = 2;
                             choiceSelected = true;
                             break;
-                        case:
-                            "3"
+                        case "3":
                             startAlgorithm = 3;
                             choiceSelected = true;
                             break;
-                        case:
-                            "4"
+                        case "4":
                             startAlgorithm = 4;
                             choiceSelected = true;
                             break;
-                        case:
-                            "5"
+                        case "5":
                             startAlgorithm = 5;
                             choiceSelected = true;
                             break;
-                        case:
-                            "6"
+                        case "6":
                             startAlgorithm = 6;
                             choiceSelected = true;
                             break;
-                        case:
-                            "7"
+                        case "7":
                             startAlgorithm = 7;
                             choiceSelected = true;
                             break;
-                        default: Console.WriteLine("Please enter a valid choice");
+                        default: Console.WriteLine("Please enter a valid choice"); break;
 
                     }
                 }
 
                 choiceSelected = false;
-                Console.WriteLine("Which range would you like to start with?")
+                Console.WriteLine("Which range would you like to start with?");
                 while (choiceSelected == false)
                 {
-                    Console.WriteLine("Select Starting Range: 10^1 (1), 10^2 (2), ")
+                    Console.WriteLine("Select Starting Range: 10^1 (1), 10^2 (2), ");
                     switch (Console.ReadLine())
                     {
-                        case:
-                            "0"
+                        case "0":
                             startAlgorithm = 0;
                             choiceSelected = true;
                             break;
-                        case:
-                            "1"
+                        case "1":
                             startAlgorithm = 1;
                             choiceSelected = true;
                             break;
-                        case:
-                            "2"
+                        case "2":
                             startAlgorithm = 2;
                             choiceSelected = true;
                             break;
-                        case:
-                            "3"
+                        case "3":
                             startAlgorithm = 3;
                             choiceSelected = true;
                             break;
-                        case:
-                            "4"
+                        case "4":
                             startAlgorithm = 4;
                             choiceSelected = true;
                             break;
-                        case:
-                            "5"
+                        case "5":
                             startAlgorithm = 5;
                             choiceSelected = true;
                             break;
-                        case:
-                            "6"
+                        case "6":
                             startAlgorithm = 6;
                             choiceSelected = true;
                             break;
-                        case:
-                            "7"
+                        case "7":
                             startAlgorithm = 7;
                             choiceSelected = true;
                             break;
-                        default: Console.WriteLine("Please enter a valid choice");
-
+                        default: Console.WriteLine("Please enter a valid choice"); break;
                     }
                 }
 
