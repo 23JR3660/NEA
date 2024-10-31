@@ -457,21 +457,45 @@ namespace NEA___Main_Code
                 Console.WriteLine("1000 " + sortNames[sortKey] + "s with numbers in range 1-" + range + " size " + arrayLength + " completed in average " + (int)totalTime / 1000 + "ms (~" + totalTime + "ms total time)");
                 Console.ForegroundColor = ConsoleColor.White;
             }
+        }
+        static void print2DArrayTotxt(double[,] testData, string testingSheetName)
+        {
             using (StreamWriter writer = new StreamWriter(testingSheetName, true))
             {
-                writer.WriteLine((int)totalTime/1000 + ",");
+                for (int i = 0; i < testData.GetLength(0); i++)
+                {
+                    for (int j = 0; j < testData.GetLength(1); j++)
+                    {
+                        if (testData[i, j] =! -1)
+                        {
+                            writer.Write(testData[i,j]);
+                        }
+                        writer.Write(",");
+                    }
+                    writer.WriteLine();
+                }
             }
+            
         }
-        static void runFullTest(string testingSheetName, int noOfTests = 1000)
+        
+        static void runFullTest(string testingSheetName, int noOfTests = 1000, int startAlgorithm = 0, int startRange = 1, int startSize = 1)
         {
+            double[,] testData = new double[26, 35];
+            for (int i = 0; i < testData.GetLength(0); i++) //Fill 2d array with "-1"s so that when printing to .csv file it is clear which cells are meant to be empty.
+            {
+                for (int j = 0; j < testData.GetLength(1); j++)
+                {
+                    testData[i, j] = -1;
+                }
+            }
             Stopwatch sw = new Stopwatch();
             for (int sortedState = 0; sortedState < 3; sortedState++)
             {
-                for (int sortBeingRun = 0; sortBeingRun < 8; sortBeingRun++) //Loop to iterate through all 8 tests for a sort from a randomised set.
+                for (int sortBeingRun = startAlgorithm; sortBeingRun < 8; sortBeingRun++) //Loop to iterate through all 8 tests for a sort from a randomised set.
                 {
-                    for (int i = 1; i < 7; i++)//Loop to iterate through all 6 ranges
+                    for (int i = startRange; i < 7; i++)//Loop to iterate through all 6 ranges
                     {
-                        for (int j = 1; j < 6; j++)//Loop to iterate through all 5 array sizes
+                        for (int j = startSize; j < 6; j++)//Loop to iterate through all 5 array sizes
                         {
                             long totalTimeTaken = 0;
                             for (int testNo = 0; testNo < noOfTests; testNo++) //Loop to run the required test 1000 times
@@ -549,18 +573,130 @@ namespace NEA___Main_Code
                                 StoreResult(sortBeingRun, range, setToBeTested, sw.ElapsedMilliseconds);
 
                             }
+                            testData[9 * sortedState + sortBeingRun, 6 * (i - 1) + j - 1] = totalTimeTaken / 1000;
                             storeResultAverage(sortBeingRun, (int)Math.Pow(10, i), (int)Math.Pow(10, j), totalTimeTaken, testingSheetName);
                         }
+                        startSize = 1; //Change start size so that the test for the next set of ranges is done from the beginning.
 
                     }
+                    startRange = 1; //change startRange so that the test for the next algorithm is done from the beginning
                 }
             }
 
         }
         static void Main(string[] args)
         {
-            Console.Write("Enter name of testing sheet .txt file:");
+            Console.Write("Enter name of testing sheet .txt file:"); Console.WriteLine();
             string fileName = Console.ReadLine();
+            Console.Write("Would you like to start from a set start point (Y) or start from the beginning of all tests (N)?")
+            if (Console.ReadLine().ToUpper() == "Y")
+            {
+                int startAlgorithm, startRange, startSize, startSortedState;
+                Console.WriteLine("Which algorithm would you like to start with?")
+                bool choiceSelected = false;
+                while (choiceSelected == false)
+                {
+                    Console.WriteLine("Select Starting algorithm : Bubble Sort (0), Merge Sort (1), Counting Sort (2), Quick Sort (3), Insertion Sort (4), LSD Radix Sort (5), MSD Radix Sort (6), Heap Sort (7)")
+                    switch (Console.ReadLine())
+                    {
+                        case: "0"
+                            startAlgorithm = 0;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "1"
+                            startAlgorithm = 1;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "2"
+                            startAlgorithm = 2;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "3"
+                            startAlgorithm = 3;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "4"
+                            startAlgorithm = 4;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "5"
+                            startAlgorithm = 5;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "6"
+                            startAlgorithm = 6;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "7"
+                            startAlgorithm = 7;
+                            choiceSelected = true;
+                            break;
+                        default: Console.WriteLine("Please enter a valid choice");
+
+                    }
+                }
+
+                choiceSelected = false;
+                Console.WriteLine("Which range would you like to start with?")
+                while (choiceSelected == false)
+                {
+                    Console.WriteLine("Select Starting Range: 10^1 (1), 10^2 (2), ")
+                    switch (Console.ReadLine())
+                    {
+                        case:
+                            "0"
+                            startAlgorithm = 0;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "1"
+                            startAlgorithm = 1;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "2"
+                            startAlgorithm = 2;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "3"
+                            startAlgorithm = 3;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "4"
+                            startAlgorithm = 4;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "5"
+                            startAlgorithm = 5;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "6"
+                            startAlgorithm = 6;
+                            choiceSelected = true;
+                            break;
+                        case:
+                            "7"
+                            startAlgorithm = 7;
+                            choiceSelected = true;
+                            break;
+                        default: Console.WriteLine("Please enter a valid choice");
+
+                    }
+                }
+
+
+            }
             runFullTest(fileName);
             Console.ReadKey();
         }
