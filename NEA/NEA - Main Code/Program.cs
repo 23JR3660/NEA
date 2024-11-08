@@ -477,8 +477,8 @@ namespace NEA___Main_Code
             }
             
         }
-        
-        static void runFullTest(string testingSheetName, int noOfTests = 1000, int startAlgorithm = 0, int startRange = 1, int startSize = 1)
+
+        static void runFullTest(string testingSheetName, int noOfTests = 1000, int startAlgorithm = 0, int startRange = 1, int startSize = 1, int startSortedState = 0)
         {
             double[,] testData = new double[26, 35];
             for (int i = 0; i < testData.GetLength(0); i++) //Fill 2d array with "-1"s so that when printing to .csv file it is clear which cells are meant to be empty.
@@ -592,7 +592,10 @@ namespace NEA___Main_Code
             Console.Write("Would you like to start from a set start point (Y) or start from the beginning of all tests (N)?");
             if (Console.ReadLine().ToUpper() == "Y")
             {
-                int startAlgorithm, startRange, startSize, startSortedState;
+                int startAlgorithm = 0;
+                int startRange = 0;
+                int startSize = 0;
+                int startSortedState = 0;
                 Console.WriteLine("Which algorithm would you like to start with?");
                 bool choiceSelected = false;
                 while (choiceSelected == false)
@@ -641,48 +644,101 @@ namespace NEA___Main_Code
                 Console.WriteLine("Which range would you like to start with?");
                 while (choiceSelected == false)
                 {
-                    Console.WriteLine("Select Starting Range: 10^1 (1), 10^2 (2), ");
+                    Console.WriteLine("Select Starting Range: 10^1 (1), 10^2 (2), 10^3 (3), 10^4 (4), 10^5 (5), Int32.MaxValue (6) ");
                     switch (Console.ReadLine())
                     {
-                        case "0":
-                            startAlgorithm = 0;
-                            choiceSelected = true;
-                            break;
                         case "1":
-                            startAlgorithm = 1;
+                            startRange = 1;
                             choiceSelected = true;
                             break;
                         case "2":
-                            startAlgorithm = 2;
+                            startRange = 2;
                             choiceSelected = true;
                             break;
                         case "3":
-                            startAlgorithm = 3;
+                            startRange = 3;
                             choiceSelected = true;
                             break;
                         case "4":
-                            startAlgorithm = 4;
+                            startRange = 4;
                             choiceSelected = true;
                             break;
                         case "5":
-                            startAlgorithm = 5;
+                            startRange = 5;
                             choiceSelected = true;
                             break;
                         case "6":
-                            startAlgorithm = 6;
-                            choiceSelected = true;
-                            break;
-                        case "7":
-                            startAlgorithm = 7;
+                            startRange = 6;
                             choiceSelected = true;
                             break;
                         default: Console.WriteLine("Please enter a valid choice"); break;
                     }
                 }
-
-
+                choiceSelected = false;
+                Console.WriteLine("Which size would you like to start with?");
+                while (choiceSelected == false)
+                {
+                    Console.WriteLine("Select Starting Size: 10^1 (1), 10^2 (2), 10^3 (3), 10^4 (4), 10^5 (5) ");
+                    switch (Console.ReadLine())
+                    {
+                        case "1":
+                            startSize = 1;
+                            choiceSelected = true;
+                            break;
+                        case "2":
+                            startSize = 2;
+                            choiceSelected = true;
+                            break;
+                        case "3":
+                            startSize = 3;
+                            choiceSelected = true;
+                            break;
+                        case "4":
+                            startSize = 4;
+                            choiceSelected = true;
+                            break;
+                        case "5":
+                            startSize = 5;
+                            choiceSelected = true;
+                            break;
+                        default: Console.WriteLine("Please enter a valid choice"); break;
+                    }
+                }
+                choiceSelected = false;
+                Console.WriteLine("Which state of sortedness would you like to start with?");
+                while (choiceSelected == false)
+                {
+                    Console.WriteLine("Select Starting State: Random (0), Pre-Sorted (1), Inverse Pre-Sorted (2) ");
+                    switch (Console.ReadLine())
+                    {
+                        case "0":
+                            startSortedState = 0;
+                            choiceSelected = true;
+                            break;
+                        case "1":
+                            startSortedState = 1;
+                            choiceSelected = true;
+                            break;
+                        case "2":
+                            startSortedState = 2;
+                            choiceSelected = true;
+                            break;
+                        default: Console.WriteLine("Please enter a valid choice"); break;
+                    }
+                }
+                string[] sortNames = { "Bubble Sort", "Merge Sort", "Counting Sort", "Quick Sort", "Insertion Sort", "LSD Radix Sort", "MSD Radix Sort", "Heap Sort" };
+                string[] ranges = {"1 to 10^1", "1 to 10^2", "1 to 10^3", "1 to 10^4", "1 to 10^5", "1 to Int32.MaxValue" };
+                string[] setSizes = {"10^1", "10^2", "10^3", "10^4", "10^5" };
+                string[] statesOfSortedness = { "Random", "Pre-Sorted", "Pre Inverse-Sorted" };
+                Console.WriteLine($"Running the full suite of tests, continuing from {statesOfSortedness[startSortedState]} sets of size {setSizes[startSize -1]} and range {ranges[startRange-1]} being sorted with {sortNames[startAlgorithm]} and then continuing on as normal");
+                runFullTest(fileName, 1000, startAlgorithm, startRange, startSize, startSortedState);
             }
-            runFullTest(fileName);
+            else
+            {
+                Console.WriteLine("Running the full suit of tests starting with random sets of size 10^1 in range 10^1 with the Bubble Sort");
+                runFullTest(fileName);
+            }
+            Console.WriteLine("Test Complete!");
             Console.ReadKey();
         }
     }
