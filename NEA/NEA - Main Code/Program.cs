@@ -11,6 +11,7 @@ namespace NEA___Main_Code
         static int sortID = 1; // Global key to organise the order of multiple tests completed in the same instance.
 
         static Random rnd = new Random(); //Global random object. Must be random since generating a new seed each instance will create overlap in generated numbers.
+        static Stopwatch testTimer = new Stopwatch();
 
         // Returns an integer array based on the parameters provided.
         static int[] makeSet(bool evenlyDistributed, bool preSorted, bool preInverseSorted, int size, int range)
@@ -478,7 +479,7 @@ namespace NEA___Main_Code
             
         }
 
-        static void runFullTest(string testingSheetName, int noOfTests = 1000, int startAlgorithm = 0, int startRange = 1, int startSize = 1, int startSortedState = 0)
+        static void runFullTest(string testingSheetName, int timeLimit, int noOfTests = 1000, int startAlgorithm = 0, int startRange = 1, int startSize = 1, int startSortedState = 0)
         {
             double[,] testData = new double[26, 35];
             for (int i = 0; i < testData.GetLength(0); i++) //Fill 2d array with "-1"s so that when printing to .csv file it is clear which cells are meant to be empty.
@@ -489,6 +490,7 @@ namespace NEA___Main_Code
                 }
             }
             Stopwatch sw = new Stopwatch();
+            testTimer.Start();
             for (int sortedState = 0; sortedState < 3; sortedState++)
             {
                 for (int sortBeingRun = startAlgorithm; sortBeingRun < 8; sortBeingRun++) //Loop to iterate through all 8 tests for a sort from a randomised set.
@@ -500,6 +502,7 @@ namespace NEA___Main_Code
                             long totalTimeTaken = 0;
                             for (int testNo = 0; testNo < noOfTests; testNo++) //Loop to run the required test 1000 times
                             {
+                                if (testTimer.ElapsedMilliseconds >= timeLimit) break;
                                 sw.Reset();
                                 int range;
                                 if (i == 6)
@@ -532,6 +535,8 @@ namespace NEA___Main_Code
                                         sw.Start();
                                         doBubbleSort(setToBeTested);
                                         sw.Stop();
+                                        
+                                        
                                         break;
                                     case 1:
                                         sw.Start();
@@ -547,6 +552,10 @@ namespace NEA___Main_Code
                                         sw.Start();
                                         doQuickSort(setToBeTested, 0, arraySize - 1);
                                         sw.Stop();
+                                        if (testNo % 100 == 0)
+                                        {
+                                            printSet(setToBeTested);
+                                        }
                                         break;
                                     case 4:
                                         sw.Start();
@@ -577,12 +586,16 @@ namespace NEA___Main_Code
                             print2DArrayTotxt(testData, testingSheetName);
                             storeResultAverage(sortBeingRun, (int)Math.Pow(10, i), (int)Math.Pow(10, j), totalTimeTaken, testingSheetName);
                         }
-                        startSize = 1; //Change start size so that the test for the next set of ranges is done from the beginning.
+                        if (testTimer.ElapsedMilliseconds >= timeLimit) return;
+                            startSize = 1; //Change start size so that the test for the next set of ranges is done from the beginning.
 
                     }
-                    startRange = 1; //change startRange so that the test for the next algorithm is done from the beginning
+                    if (testTimer.ElapsedMilliseconds >= timeLimit) return;
+                        startRange = 1; //change startRange so that the test for the next algorithm is done from the beginning
                 }
+                if (testTimer.ElapsedMilliseconds >= timeLimit) return;
             }
+            if (testTimer.ElapsedMilliseconds >= timeLimit) return;
 
         }
         static void Main(string[] args)
@@ -730,13 +743,55 @@ namespace NEA___Main_Code
                 string[] ranges = {"1 to 10^1", "1 to 10^2", "1 to 10^3", "1 to 10^4", "1 to 10^5", "1 to Int32.MaxValue" };
                 string[] setSizes = {"10^1", "10^2", "10^3", "10^4", "10^5" };
                 string[] statesOfSortedness = { "Random", "Pre-Sorted", "Pre Inverse-Sorted" };
+
+                int maxTime = 604800000;
+
                 Console.WriteLine($"Running the full suite of tests, continuing from {statesOfSortedness[startSortedState]} sets of size {setSizes[startSize -1]} and range {ranges[startRange-1]} being sorted with {sortNames[startAlgorithm]} and then continuing on as normal");
                 runFullTest(fileName, 1000, startAlgorithm, startRange, startSize, startSortedState);
+                choiceSelected = false;
+                Console.WriteLine("Would you like to set a time limit?");
+                while (choiceSelected == false)
+                {
+                    Console.WriteLine("Yes (Y) or No (N)");
+                    switch (Console.ReadLine().ToUpper())
+                    {
+                        case "Y":
+                            Console.WriteLine("Enter run length in ms");
+                            maxTime = int.Parse(Console.ReadLine());
+                            choiceSelected = true;
+                            break;
+                        case "N":
+                            Console.WriteLine("Max time will be set to one week");
+                            choiceSelected = true;
+                            break;
+                        default: Console.WriteLine("Please enter a valid choice"); break;
+                    }
+                }
             }
             else
             {
+                int maxTime = 604800000;
                 Console.WriteLine("Running the full suit of tests starting with random sets of size 10^1 in range 10^1 with the Bubble Sort");
-                runFullTest(fileName);
+                bool choiceSelected = false;
+                Console.WriteLine("Would you like to set a time limit?");
+                while (choiceSelected == false)
+                {
+                    Console.WriteLine("Yes (Y) or No (N)");
+                    switch (Console.ReadLine().ToUpper())
+                    {
+                        case "Y":
+                            Console.WriteLine("Enter run length in ms");
+                             maxTime = int.Parse(Console.ReadLine());
+                            choiceSelected = true;
+                            break;
+                        case "N":
+                            Console.WriteLine("Max time will be set to one week");
+                            choiceSelected = true;
+                            break;
+                        default: Console.WriteLine("Please enter a valid choice"); break;
+                    }
+                }
+                runFullTest(fileName, maxTime);
             }
             Console.WriteLine("Test Complete!");
             Console.ReadKey();
